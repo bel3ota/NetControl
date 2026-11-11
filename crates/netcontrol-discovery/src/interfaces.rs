@@ -51,9 +51,15 @@ pub fn which(tool: &str) -> bool {
     std::env::split_paths(&path).any(|dir| dir.join(tool).is_file())
 }
 
+#[cfg(unix)]
 pub fn is_root() -> bool {
     // SAFETY: geteuid has no preconditions.
     unsafe { libc::geteuid() == 0 }
+}
+
+#[cfg(not(unix))]
+pub fn is_root() -> bool {
+    false
 }
 
 /// True when the process holds CAP_NET_RAW (bit 13) even without full root.
