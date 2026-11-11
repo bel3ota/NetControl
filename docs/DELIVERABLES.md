@@ -3,7 +3,7 @@
 | # | Deliverable | Status | Location |
 | --- | --- | --- | --- |
 | 1 | Complete source code | ✅ | repository root (`crates/`, `apps/`, `docs/`, `packaging/`) |
-| 2 | Windows installer (.exe/.msi) | ⚠ Not buildable on this Linux host; workflow + instructions supplied | `.github/workflows/build-artifacts.yml`, `packaging/windows/BUILD.md` |
+| 2 | Windows installer (.exe/.msi) | ⚠ Built by the push workflow on Windows; local Linux host cannot produce it | `.github/workflows/build-artifacts.yml`, `packaging/windows/BUILD.md` |
 | 3 | Omarchy/Arch CLI executable | ✅ `netcontrol-linux-x86_64` | local `deliverables/` (not committed) |
 | 4 | Arch package / PKGBUILD | ✅ `netcontrol-0.1.0-1-x86_64.pkg.tar.zst` + PKGBUILD | local `deliverables/`, `packaging/arch/` |
 | 5 | Android APK | ✅ built on every push; debug-signed, emulator-tested | CI artifact `netcontrol-android-apk` (local: `deliverables/`) |
