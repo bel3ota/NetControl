@@ -1,8 +1,6 @@
 name: Build Windows installers and Android APK
 
-on:
-  push:
-  workflow_dispatch:
+on: [push, workflow_dispatch]
 
 permissions:
   contents: write
