@@ -177,6 +177,7 @@ impl InterfaceManager {
     }
 }
 
+#[cfg(not(windows))]
 fn ipv4_from_pnet(v4: ipnetwork::Ipv4Network) -> Ipv4Info {
     let prefix = v4.prefix();
     Ipv4Info {
@@ -456,70 +457,111 @@ mod platform {
         dns: Vec<String>,
         ssid: Option<String>,
         speed: Option<u64>,
+        mac: Option<String>,
+        status: Option<String>,
+        ipv4: Vec<(String, u8)>,
+        ipv6: Vec<String>,
     }
 
     pub fn enumerate() -> Result<Vec<NetworkInterface>> {
-        let meta = windows_metadata();
         let mut out = Vec::new();
-        for pnet in pnet_datalink::interfaces() {
-            if pnet.name.is_empty() {
+        for meta in windows_metadata() {
+            if meta.alias.is_empty() {
                 continue;
             }
-            let info = meta.iter().find(|m| {
-                m.alias.eq_ignore_ascii_case(&pnet.name) || m.description == pnet.description
-            });
-            let is_loopback = pnet.is_loopback();
-            let mut ipv4 = Vec::new();
-            let mut ipv6 = Vec::new();
-            for ip in &pnet.ips {
-                match ip {
-                    ipnetwork::IpNetwork::V4(v4) => ipv4.push(ipv4_from_pnet(*v4)),
-                    ipnetwork::IpNetwork::V6(v6) => ipv6.push(v6.ip().to_string()),
-                }
-            }
-            let gateway4 = info.and_then(|m| m.gateway.clone());
-            let desc = pnet.description.to_ascii_lowercase();
+            let description = meta.description.to_ascii_lowercase();
+            let is_loopback =
+                meta.alias.eq_ignore_ascii_case("Loopback") || description.contains("loopback");
+            let is_up = meta
+                .status
+                .as_deref()
+                .map(|status| status.eq_ignore_ascii_case("up"))
+                .unwrap_or(true);
             let kind = if is_loopback {
                 InterfaceKind::Loopback
-            } else if info.and_then(|m| m.ssid.as_ref()).is_some() || desc.contains("wireless") {
+            } else if meta.ssid.is_some()
+                || description.contains("wireless")
+                || description.contains("wi-fi")
+                || description.contains("wifi")
+            {
                 InterfaceKind::Wifi
-            } else if desc.contains("usb") {
+            } else if description.contains("usb") {
                 InterfaceKind::UsbEthernet
-            } else if desc.contains("virtual")
-                || desc.contains("hyper-v")
-                || desc.contains("vmware")
-                || desc.contains("tap")
+            } else if description.contains("virtual")
+                || description.contains("hyper-v")
+                || description.contains("vmware")
+                || description.contains("tap")
             {
                 InterfaceKind::Virtual
             } else {
                 InterfaceKind::Ethernet
             };
+            let ipv4 = meta
+                .ipv4
+                .iter()
+                .filter_map(|(address, prefix)| {
+                    let parsed = address.parse::<Ipv4Addr>().ok()?;
+                    let cidr = format!("{parsed}/{prefix}");
+                    let broadcast = cidr
+                        .parse::<ipnet::Ipv4Net>()
+                        .ok()
+                        .map(|network| network.broadcast().to_string());
+                    Some(Ipv4Info {
+                        address: parsed.to_string(),
+                        prefix: *prefix,
+                        netmask: prefix_to_netmask(*prefix),
+                        broadcast,
+                        cidr,
+                    })
+                })
+                .collect();
             out.push(NetworkInterface {
-                is_default: gateway4.is_some(),
-                name: pnet.name.clone(),
+                is_default: meta.gateway.is_some(),
+                name: meta.alias,
                 kind,
-                mac: pnet
-                    .mac
-                    .map(|m| m.to_string())
-                    .and_then(|m| normalize_mac(&m)),
-                is_up: pnet.is_up(),
+                mac: meta.mac.and_then(|value| normalize_mac(&value)),
+                is_up,
                 is_loopback,
                 ipv4,
-                ipv6,
-                gateway4,
+                ipv6: meta.ipv6,
+                gateway4: meta.gateway,
                 gateway6: None,
-                dns: info.map(|m| m.dns.clone()).unwrap_or_default(),
-                ssid: info.and_then(|m| m.ssid.clone()),
-                speed_mbps: info.and_then(|m| m.speed),
+                dns: meta.dns,
+                ssid: meta.ssid,
+                speed_mbps: meta.speed,
                 driver: None,
-                usb: desc.contains("usb"),
+                usb: description.contains("usb"),
             });
         }
         Ok(out)
     }
 
+    fn items(value: &Value) -> Vec<&Value> {
+        match value {
+            Value::Array(entries) => entries.iter().collect(),
+            Value::Object(_) => vec![value],
+            _ => Vec::new(),
+        }
+    }
+
+    fn text(value: &Value) -> Option<String> {
+        value.as_str().map(str::to_string).filter(|v| !v.is_empty())
+    }
+
+    fn values(value: &Value) -> Vec<String> {
+        items(value).into_iter().filter_map(text).collect()
+    }
+
+    fn prefix(value: &Value) -> u8 {
+        value
+            .as_u64()
+            .and_then(|v| u8::try_from(v).ok())
+            .or_else(|| value.as_str().and_then(|v| v.parse().ok()))
+            .unwrap_or(24)
+    }
+
     fn windows_metadata() -> Vec<WinMeta> {
-        let script = "Get-NetIPConfiguration | Select-Object InterfaceAlias,InterfaceDescription,@{n='Gateway';e={$_.IPv4DefaultGateway.NextHop}},@{n='Dns';e={$_.DNSServer.ServerAddresses}},@{n='Ssid';e={$_.NetProfile.Name}},@{n='Speed';e={$_.NetAdapter.LinkSpeed}} | ConvertTo-Json -Compress";
+        let script = r#"Get-NetIPConfiguration | Select-Object InterfaceAlias,InterfaceDescription,@{n='Gateway';e={$_.IPv4DefaultGateway.NextHop}},@{n='Dns';e={$_.DNSServer.ServerAddresses}},@{n='Ssid';e={$_.NetProfile.Name}},@{n='Speed';e={$_.NetAdapter.LinkSpeed}},@{n='Mac';e={$_.NetAdapter.MacAddress}},@{n='Status';e={$_.NetAdapter.Status}},@{n='IPv4';e={$_.IPv4Address}},@{n='IPv6';e={$_.IPv6Address}} | ConvertTo-Json -Depth 5 -Compress"#;
         let output = Command::new("powershell.exe")
             .args(["-NoProfile", "-NonInteractive", "-Command", script])
             .output();
@@ -530,52 +572,55 @@ mod platform {
             return Vec::new();
         }
         let text = String::from_utf8_lossy(&output.stdout);
-        let value: Value = serde_json::from_str(&text).unwrap_or(Value::Null);
-        let items: Vec<&Value> = match &value {
-            Value::Array(items) => items.iter().collect(),
-            Value::Object(_) => vec![&value],
-            _ => Vec::new(),
-        };
-        items
+        let value: Value = serde_json::from_str(text.trim()).unwrap_or(Value::Null);
+        items(&value)
             .into_iter()
             .map(|item| {
-                let dns = item
-                    .get("Dns")
-                    .map(|v| match v {
-                        Value::Array(a) => a
-                            .iter()
-                            .filter_map(|x| x.as_str().map(str::to_string))
-                            .collect(),
-                        Value::String(s) => vec![s.clone()],
-                        _ => Vec::new(),
+                let ipv4 = item
+                    .get("IPv4")
+                    .map(items)
+                    .unwrap_or_default()
+                    .into_iter()
+                    .filter_map(|entry| {
+                        let address = entry.get("IPAddress").and_then(text)?;
+                        let prefix = entry.get("PrefixLength").map(prefix).unwrap_or(24);
+                        Some((address, prefix))
                     })
-                    .unwrap_or_default();
+                    .collect();
+                let ipv6 = item
+                    .get("IPv6")
+                    .map(items)
+                    .unwrap_or_default()
+                    .into_iter()
+                    .filter_map(|entry| entry.get("IPAddress").and_then(text))
+                    .collect();
+                let dns = item.get("Dns").map(values).unwrap_or_default();
+                let gateway = item.get("Gateway").and_then(text);
+                let ssid = item
+                    .get("Ssid")
+                    .and_then(text)
+                    .filter(|value| !value.is_empty());
                 let speed = item
                     .get("Speed")
-                    .and_then(|v| v.as_str())
-                    .and_then(parse_link_speed_mbps);
+                    .and_then(text)
+                    .and_then(|value| parse_link_speed_mbps(&value));
                 WinMeta {
                     alias: item
                         .get("InterfaceAlias")
-                        .and_then(Value::as_str)
-                        .unwrap_or_default()
-                        .to_string(),
+                        .and_then(text)
+                        .unwrap_or_default(),
                     description: item
                         .get("InterfaceDescription")
-                        .and_then(Value::as_str)
-                        .unwrap_or_default()
-                        .to_string(),
-                    gateway: item
-                        .get("Gateway")
-                        .and_then(Value::as_str)
-                        .map(str::to_string),
+                        .and_then(text)
+                        .unwrap_or_default(),
+                    gateway,
                     dns,
-                    ssid: item
-                        .get("Ssid")
-                        .and_then(Value::as_str)
-                        .filter(|s| !s.is_empty())
-                        .map(str::to_string),
+                    ssid,
                     speed,
+                    mac: item.get("Mac").and_then(text),
+                    status: item.get("Status").and_then(text),
+                    ipv4,
+                    ipv6,
                 }
             })
             .collect()
