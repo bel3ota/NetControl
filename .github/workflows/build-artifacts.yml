@@ -35,14 +35,24 @@ jobs:
         working-directory: apps/desktop
         run: npm ci
 
-      - name: Build portable Windows executable
+      - name: Build frontend bundle
         working-directory: apps/desktop
+        run: npm run build
+
+      - name: Build portable Windows executable
         shell: pwsh
         run: |
-          npm run tauri build -- --no-bundle 2>&1 | Tee-Object -FilePath tauri-build.log
+          cargo build --release -p netcontrol-desktop --verbose 2>&1 | Tee-Object -FilePath tauri-build.log
           if ($LASTEXITCODE -ne 0) {
             "### Windows executable build failed" | Out-File -Append $env:GITHUB_STEP_SUMMARY
-            Get-Content tauri-build.log -Tail 120 | Out-File -Append $env:GITHUB_STEP_SUMMARY
+            Get-Content tauri-build.log -Tail 160 | Out-File -Append $env:GITHUB_STEP_SUMMARY
+            Get-Content tauri-build.log |
+              Where-Object { $_ -match 'error(\[|:)|failed|cannot|not found|undefined' } |
+              Select-Object -Last 8 |
+              ForEach-Object {
+                $safe = $_ -replace '%','%25' -replace "`r",'' -replace "`n",'%0A'
+                Write-Output "::error title=Windows build::$safe"
+              }
             exit $LASTEXITCODE
           }
 
@@ -69,7 +79,7 @@ jobs:
           name: netcontrol-windows
           path: |
             artifacts/windows/NetControl.exe
-            apps/desktop/tauri-build.log
+            tauri-build.log
           if-no-files-found: warn
 
   android:
