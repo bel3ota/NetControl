@@ -1,0 +1,31 @@
+[package]
+name = "netcontrol-gateway"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Authorized gateway adapters (OpenWrt, MikroTik, UniFi, pfSense, OPNsense, Linux)"
+
+[dependencies]
+netcontrol-core = { path = "../netcontrol-core" }
+libc.workspace = true
+async-trait.workspace = true
+base64.workspace = true
+chrono.workspace = true
+md-5 = "0.10"
+native-tls = "0.2"
+reqwest.workspace = true
+tokio-native-tls = "0.3"
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+url = "2.5"
+uuid.workspace = true
+zeroize.workspace = true
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["macros", "rt-multi-thread", "net", "io-util"] }

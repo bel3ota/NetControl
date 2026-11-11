@@ -1,0 +1,35 @@
+[package]
+name = "netcontrol-service"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "NetControl management orchestration and REST API"
+
+[dependencies]
+netcontrol-core = { path = "../netcontrol-core" }
+netcontrol-discovery = { path = "../netcontrol-discovery" }
+netcontrol-gateway = { path = "../netcontrol-gateway" }
+async-trait.workspace = true
+axum.workspace = true
+base64.workspace = true
+chrono.workspace = true
+futures.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+tokio-stream.workspace = true
+tower.workspace = true
+tower-http.workspace = true
+tracing.workspace = true
+uuid.workspace = true
+axum-server = { version = "0.9.2", features = ["tls-rustls"] }
+libc.workspace = true
+
+[dev-dependencies]
+reqwest.workspace = true
+tempfile = "3.13"
+tower = { workspace = true, features = ["util"] }

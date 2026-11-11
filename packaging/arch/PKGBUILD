@@ -1,0 +1,58 @@
+# Maintainer: NetControl Contributors
+pkgname=netcontrol
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="Authorized LAN discovery, monitoring and verified access control"
+arch=('x86_64' 'aarch64')
+url="https://example.invalid/netcontrol"
+license=('MIT')
+depends=('glibc' 'gcc-libs' 'nftables' 'iproute2')
+makedepends=('cargo' 'rust')
+optdepends=(
+  'nmap: deeper host and port discovery'
+  'arp-scan: raw ARP sweeps'
+  'avahi: mDNS coexistence'
+  'openssh: OpenWrt and pfSense adapters'
+  'sshpass: SSH password authentication for gateway adapters'
+)
+install=netcontrol.install
+backup=()
+source=("netcontrol-$pkgver.tar.gz")
+sha256sums=('29716fdf0b3bd41ba118caebee18078704d788192229020be349c9aa93376863')
+
+build() {
+  cd "$srcdir/netcontrol-$pkgver"
+  export CARGO_TARGET_DIR="$srcdir/target"
+  # Arch's default LDFLAGS include --as-needed, which can reorder the native
+  # aws-lc static library ahead of the Rust objects and produce undefined
+  # symbols. Cargo/rustc manage native link ordering for these crates.
+  unset CFLAGS CXXFLAGS LDFLAGS
+  cargo build --release --locked -p netcontrol-cli -p netcontrol-helper
+}
+
+package() {
+  cd "$srcdir/netcontrol-$pkgver"
+
+  install -Dm755 "$srcdir/target/release/netcontrol" "$pkgdir/usr/bin/netcontrol"
+  install -Dm755 "$srcdir/target/release/netcontrol-helper" \
+    "$pkgdir/usr/lib/netcontrol/netcontrol-helper"
+
+  install -Dm644 packaging/netcontrol.service \
+    "$pkgdir/usr/lib/systemd/system/netcontrol.service"
+  install -Dm644 packaging/netcontrol.sysusers \
+    "$pkgdir/usr/lib/sysusers.d/netcontrol.conf"
+  install -Dm644 packaging/netcontrol.tmpfiles \
+    "$pkgdir/usr/lib/tmpfiles.d/netcontrol.conf"
+  install -Dm440 packaging/sudoers.netcontrol \
+    "$pkgdir/etc/sudoers.d/netcontrol"
+
+  install -Dm644 packaging/config.example.toml \
+    "$pkgdir/usr/share/netcontrol/config.example.toml"
+
+  install -Dm644 README.md "$pkgdir/usr/share/doc/netcontrol/README.md"
+  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/netcontrol/LICENSE"
+  for doc in ARCHITECTURE INSTALL GATEWAYS SECURITY LIMITATIONS API DEVELOPMENT; do
+    install -Dm644 "docs/$doc.md" "$pkgdir/usr/share/doc/netcontrol/$doc.md"
+  done
+  install -Dm644 docs/openapi.json "$pkgdir/usr/share/doc/netcontrol/openapi.json"
+}

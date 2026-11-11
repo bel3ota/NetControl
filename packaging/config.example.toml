@@ -1,0 +1,30 @@
+# NetControl configuration example.
+# Copy to ~/.config/netcontrol/config.toml (or
+# /var/lib/netcontrol/config.toml when running the systemd unit).
+
+[server]
+# Loopback is the safe default. For remote access, use TLS and set
+# allow_remote = true (see docs/INSTALL.md).
+listen = "127.0.0.1:8787"
+# tls_cert = "/etc/netcontrol/server.crt"
+# tls_key = "/etc/netcontrol/server.key"
+session_hours = 12
+allow_remote = false
+allow_public_scan = false
+trust_proxy = false
+scan_on_start = false
+
+[scan]
+interval_seconds = 120
+timeout_ms = 1200
+max_hosts = 1024
+methods = ["neighbor", "icmp", "mdns"]
+enable_nmap = false
+enable_mdns = true
+nmap_path = "nmap"
+# auto | privileged | unprivileged
+privilege_mode = "auto"
+
+[logging]
+level = "info"
+json = false

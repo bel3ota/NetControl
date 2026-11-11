@@ -1,0 +1,19 @@
+[package]
+name = "netcontrol-helper"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Privileged, whitelist-only enforcement helper for NetControl"
+
+[[bin]]
+name = "netcontrol-helper"
+path = "src/main.rs"
+
+[dependencies]
+netcontrol-core = { path = "../netcontrol-core" }
+netcontrol-gateway = { path = "../netcontrol-gateway" }
+libc.workspace = true
+serde.workspace = true
+serde_json.workspace = true

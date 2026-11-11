@@ -1,0 +1,155 @@
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("./assets/fonts/inter-400.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("./assets/fonts/inter-500.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("./assets/fonts/inter-600.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("./assets/fonts/inter-700.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Space Grotesk";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("./assets/fonts/space-grotesk-400.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Space Grotesk";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("./assets/fonts/space-grotesk-500.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Space Grotesk";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("./assets/fonts/space-grotesk-600.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Space Grotesk";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("./assets/fonts/space-grotesk-700.woff2") format("woff2");
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+  body {
+    @apply bg-base text-ink font-sans antialiased;
+    background-image: radial-gradient(
+        1200px 600px at 18% -10%,
+        rgba(63, 224, 174, 0.07),
+        transparent 60%
+      ),
+      radial-gradient(900px 500px at 110% 10%, rgba(92, 157, 255, 0.06), transparent 50%);
+    background-attachment: fixed;
+  }
+  ::selection {
+    background: rgba(63, 224, 174, 0.25);
+  }
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #24384a transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 9px;
+    height: 9px;
+  }
+  *::-webkit-scrollbar-thumb {
+    background: #24384a;
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+  input,
+  select,
+  textarea {
+    @apply bg-transparent outline-none;
+  }
+}
+
+@layer components {
+  .panel {
+    @apply rounded-2xl border border-line bg-panel/80 shadow-panel backdrop-blur-sm;
+  }
+  .panel-header {
+    @apply flex items-center justify-between gap-3 border-b border-line/80 px-5 py-4;
+  }
+  .eyebrow {
+    @apply font-mono text-[10px] font-medium uppercase tracking-[0.2em] text-faint;
+  }
+  .label {
+    @apply mb-1.5 block text-xs font-medium text-muted;
+  }
+  .input {
+    @apply w-full rounded-xl border border-line bg-raised px-3 py-2.5 text-sm text-ink placeholder:text-faint focus:border-mint/50 focus:ring-2 focus:ring-mint/10 transition;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-3.5 py-2 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply btn bg-mint text-[#04120D] hover:bg-[#6BEBC4] shadow-[0_10px_30px_-14px_rgba(63,224,174,.9)];
+  }
+  .btn-ghost {
+    @apply btn border border-line bg-raised/60 text-ink hover:border-line-strong hover:bg-panel-2;
+  }
+  .btn-danger {
+    @apply btn border border-rose/30 bg-rose/10 text-rose hover:bg-rose/15;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-line bg-raised/70 px-2.5 py-1 text-[11px] font-medium text-muted;
+  }
+  .mono {
+    @apply font-mono tabular-nums;
+  }
+  .nav-item {
+    @apply relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-muted transition hover:bg-panel-2 hover:text-ink;
+  }
+  .nav-item-active {
+    @apply bg-panel-2 text-ink shadow-[inset_0_0_0_1px_rgba(39,64,82,.55)];
+  }
+  .nav-item-active::before {
+    content: "";
+    @apply absolute left-0 top-2 h-5 w-[2px] rounded-full bg-mint;
+  }
+  .table-header {
+    @apply text-left font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-faint;
+  }
+  .skeleton {
+    @apply animate-pulse rounded-lg bg-line/60;
+  }
+  .focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mint/40;
+  }
+}

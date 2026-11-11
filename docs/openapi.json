@@ -1,0 +1,1380 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "NetControl API",
+    "version": "0.1.0",
+    "description": "Authenticated management API for NetControl. All mutating device operations require confirmation and an authorized gateway. Operations that cannot be verified are reported with verified=false and never claim success.",
+    "license": {
+      "name": "MIT"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://127.0.0.1:8787",
+      "description": "Local TLS (recommended)"
+    },
+    {
+      "url": "http://127.0.0.1:8787",
+      "description": "Local loopback"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Liveness probe",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Service is running"
+          }
+        }
+      }
+    },
+    "/api/v1/auth/login": {
+      "post": {
+        "summary": "Authenticate and obtain a session token",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Session issued",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthSession"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        }
+      }
+    },
+    "/api/v1/auth/logout": {
+      "post": {
+        "summary": "Revoke the current session",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Revoked"
+          }
+        }
+      }
+    },
+    "/api/v1/auth/me": {
+      "get": {
+        "summary": "Current user",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/password": {
+      "post": {
+        "summary": "Change your own password (revokes all sessions)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Password changed"
+          },
+          "400": {
+            "description": "Current password incorrect"
+          }
+        }
+      }
+    },
+    "/api/v1/system/status": {
+      "get": {
+        "summary": "Service and platform status",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/dashboard": {
+      "get": {
+        "summary": "Dashboard summary with counts, network, gateway and traffic",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dashboard",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Dashboard"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/interfaces": {
+      "get": {
+        "summary": "List network interfaces",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Interfaces",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NetworkInterface"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/networks": {
+      "get": {
+        "summary": "Known networks",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Networks"
+          }
+        }
+      }
+    },
+    "/api/v1/scans": {
+      "post": {
+        "summary": "Run an authorized network scan",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScanRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Scan result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScanResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Confirmation missing"
+          },
+          "422": {
+            "description": "Unsupported or scan in progress"
+          },
+          "403": {
+            "description": "Scope guard rejected target"
+          }
+        }
+      },
+      "get": {
+        "summary": "Recent scan sessions",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Scans"
+          }
+        }
+      }
+    },
+    "/api/v1/devices": {
+      "get": {
+        "summary": "List or search devices",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "online",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "blocked",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "trusted",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 500
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of devices",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DevicePage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/devices/{id}": {
+      "get": {
+        "summary": "Device detail with history and rules",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Device detail"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Rename, categorize, annotate or trust a device",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DevicePatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated device"
+          }
+        }
+      }
+    },
+    "/api/v1/devices/{id}/trust": {
+      "post": {
+        "summary": "Mark or unmark a trusted device",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Device"
+          }
+        }
+      }
+    },
+    "/api/v1/devices/{id}/block": {
+      "post": {
+        "summary": "Block a device (requires confirmation and an authorized gateway)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RestrictionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Enforcement result; check verified",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/devices/{id}/pause": {
+      "post": {
+        "summary": "Temporarily pause internet access",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Enforcement result"
+          }
+        }
+      }
+    },
+    "/api/v1/devices/{id}/unblock": {
+      "post": {
+        "summary": "Restore access",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Enforcement result"
+          }
+        }
+      }
+    },
+    "/api/v1/devices/{id}/bandwidth": {
+      "post": {
+        "summary": "Apply per-device bandwidth limits",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BandwidthRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Enforcement result"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Clear bandwidth limits",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Enforcement result"
+          }
+        }
+      }
+    },
+    "/api/v1/access-rules": {
+      "get": {
+        "summary": "Access-control rule history",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Rules"
+          }
+        }
+      }
+    },
+    "/api/v1/bandwidth-rules": {
+      "get": {
+        "summary": "Bandwidth rule history",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Rules"
+          }
+        }
+      }
+    },
+    "/api/v1/monitoring/overview": {
+      "get": {
+        "summary": "Current measured interface traffic",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Traffic overview",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Traffic"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/monitoring/history": {
+      "get": {
+        "summary": "Traffic history",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "minutes",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "interface",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Samples"
+          }
+        }
+      }
+    },
+    "/api/v1/events": {
+      "get": {
+        "summary": "Server-sent events stream (token query parameter)",
+        "security": [],
+        "parameters": [
+          {
+            "name": "token",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "text/event-stream"
+          }
+        }
+      }
+    },
+    "/api/v1/audit": {
+      "get": {
+        "summary": "Audit log (admin)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Audit entries"
+          }
+        }
+      }
+    },
+    "/api/v1/gateways": {
+      "get": {
+        "summary": "Configured gateways (secrets never returned)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Gateways"
+          }
+        }
+      },
+      "post": {
+        "summary": "Add a gateway; secrets are encrypted at rest",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GatewayInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Gateway"
+          }
+        }
+      }
+    },
+    "/api/v1/gateways/{id}": {
+      "put": {
+        "summary": "Update a gateway",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Gateway"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a gateway",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        }
+      }
+    },
+    "/api/v1/gateways/{id}/test": {
+      "post": {
+        "summary": "Probe a gateway and report real capabilities",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Probe result"
+          }
+        }
+      }
+    },
+    "/api/v1/gateways/{id}/activate": {
+      "post": {
+        "summary": "Select the active enforcement gateway",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Activated"
+          }
+        }
+      }
+    },
+    "/api/v1/gateways/{id}/clients": {
+      "get": {
+        "summary": "Clients reported by the gateway",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Clients"
+          }
+        }
+      }
+    },
+    "/api/v1/gateway/status": {
+      "get": {
+        "summary": "Probe the active gateway",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Probe"
+          }
+        }
+      }
+    },
+    "/api/v1/settings": {
+      "get": {
+        "summary": "Application settings",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Settings"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update settings (admin)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Settings"
+          }
+        }
+      }
+    },
+    "/api/v1/users": {
+      "get": {
+        "summary": "List users (admin)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Users"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create user (admin)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "schemas": {
+      "LoginRequest": {
+        "type": "object",
+        "required": [
+          "username",
+          "password"
+        ],
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string",
+            "format": "password"
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "admin",
+              "viewer"
+            ]
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "disabled": {
+            "type": "boolean"
+          }
+        }
+      },
+      "AuthSession": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string"
+          },
+          "expires_at": {
+            "type": "string"
+          },
+          "user": {
+            "$ref": "#/components/schemas/User"
+          }
+        }
+      },
+      "Device": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "mac": {
+            "type": "string",
+            "nullable": true
+          },
+          "ip": {
+            "type": "string",
+            "nullable": true
+          },
+          "hostname": {
+            "type": "string",
+            "nullable": true
+          },
+          "vendor": {
+            "type": "string",
+            "nullable": true
+          },
+          "category": {
+            "type": "string"
+          },
+          "custom_name": {
+            "type": "string",
+            "nullable": true
+          },
+          "online": {
+            "type": "boolean"
+          },
+          "is_trusted": {
+            "type": "boolean"
+          },
+          "enforcement": {
+            "type": "string",
+            "enum": [
+              "none",
+              "pending",
+              "applied",
+              "failed",
+              "unsupported",
+              "expired"
+            ]
+          },
+          "first_seen": {
+            "type": "string"
+          },
+          "last_seen": {
+            "type": "string"
+          },
+          "is_blocked": {
+            "type": "boolean"
+          }
+        }
+      },
+      "DevicePage": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Device"
+            }
+          },
+          "total": {
+            "type": "integer"
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "offset": {
+            "type": "integer"
+          }
+        }
+      },
+      "DevicePatch": {
+        "type": "object",
+        "properties": {
+          "custom_name": {
+            "type": "string",
+            "nullable": true
+          },
+          "category": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string",
+            "nullable": true
+          },
+          "is_trusted": {
+            "type": "boolean"
+          }
+        }
+      },
+      "NetworkInterface": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "mac": {
+            "type": "string",
+            "nullable": true
+          },
+          "ipv4": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "gateway4": {
+            "type": "string",
+            "nullable": true
+          },
+          "dns": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "ssid": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ScanRequest": {
+        "type": "object",
+        "required": [
+          "confirm"
+        ],
+        "properties": {
+          "interface": {
+            "type": "string"
+          },
+          "methods": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "neighbor",
+                "icmp",
+                "arp",
+                "tcp",
+                "nmap",
+                "mdns"
+              ]
+            }
+          },
+          "nmap": {
+            "type": "boolean"
+          },
+          "ports": {
+            "type": "boolean"
+          },
+          "mdns": {
+            "type": "boolean"
+          },
+          "timeout_ms": {
+            "type": "integer"
+          },
+          "max_hosts": {
+            "type": "integer"
+          },
+          "allow_public": {
+            "type": "boolean"
+          },
+          "confirm": {
+            "type": "boolean",
+            "description": "Must be true; scanning is an explicitly authorized action"
+          }
+        }
+      },
+      "ScanResult": {
+        "type": "object",
+        "properties": {
+          "report": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "devices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Device"
+            }
+          },
+          "new_devices": {
+            "type": "integer"
+          }
+        }
+      },
+      "RestrictionRequest": {
+        "type": "object",
+        "required": [
+          "confirm"
+        ],
+        "properties": {
+          "duration_seconds": {
+            "type": "integer"
+          },
+          "until": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "confirm": {
+            "type": "boolean"
+          }
+        }
+      },
+      "BandwidthRequest": {
+        "type": "object",
+        "required": [
+          "confirm"
+        ],
+        "properties": {
+          "download_kbps": {
+            "type": "integer"
+          },
+          "upload_kbps": {
+            "type": "integer"
+          },
+          "priority": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 7
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "confirm": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ActionResult": {
+        "type": "object",
+        "properties": {
+          "result": {
+            "type": "object",
+            "additionalProperties": true,
+            "properties": {
+              "success": {
+                "type": "boolean"
+              },
+              "verified": {
+                "type": "boolean"
+              },
+              "action": {
+                "type": "string"
+              },
+              "detail": {
+                "type": "string"
+              },
+              "adapter": {
+                "type": "string"
+              },
+              "applied_at": {
+                "type": "string"
+              }
+            }
+          },
+          "device": {
+            "$ref": "#/components/schemas/Device"
+          }
+        }
+      },
+      "GatewayInput": {
+        "type": "object",
+        "required": [
+          "name",
+          "kind",
+          "host"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "openwrt",
+              "mikrotik",
+              "unifi",
+              "pfsense",
+              "opnsense",
+              "linux"
+            ]
+          },
+          "host": {
+            "type": "string"
+          },
+          "port": {
+            "type": "integer"
+          },
+          "username": {
+            "type": "string"
+          },
+          "secret": {
+            "type": "string",
+            "format": "password",
+            "description": "Encrypted at rest; never returned"
+          },
+          "site": {
+            "type": "string"
+          },
+          "interface_hint": {
+            "type": "string"
+          },
+          "tls": {
+            "type": "boolean"
+          },
+          "tls_insecure": {
+            "type": "boolean"
+          },
+          "enabled": {
+            "type": "boolean"
+          }
+        }
+      },
+      "Traffic": {
+        "type": "object",
+        "properties": {
+          "interface": {
+            "type": "string",
+            "nullable": true
+          },
+          "sampled_at": {
+            "type": "string"
+          },
+          "rx_bps": {
+            "type": "integer"
+          },
+          "tx_bps": {
+            "type": "integer"
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "measured",
+              "gateway",
+              "estimated",
+              "unavailable"
+            ]
+          }
+        }
+      },
+      "Dashboard": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {
+          "total_devices": {
+            "type": "integer"
+          },
+          "online_devices": {
+            "type": "integer"
+          },
+          "offline_devices": {
+            "type": "integer"
+          },
+          "blocked_devices": {
+            "type": "integer"
+          },
+          "trusted_devices": {
+            "type": "integer"
+          },
+          "network": {
+            "type": "object",
+            "nullable": true
+          },
+          "traffic": {
+            "$ref": "#/components/schemas/Traffic"
+          },
+          "enforcement_available": {
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  }
+}

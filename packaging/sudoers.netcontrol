@@ -1,0 +1,3 @@
+# Allow the NetControl daemon to run the single privileged helper without a
+# password. The helper validates every request and never executes a shell.
+netcontrol ALL=(root) NOPASSWD: /usr/lib/netcontrol/netcontrol-helper

@@ -1,0 +1,34 @@
+post_install() {
+  cat <<'EOF'
+NetControl installed.
+
+1. Enable the service:
+     sudo systemctl enable --now netcontrol
+
+2. The first administrator password is written to:
+     /var/lib/netcontrol/initial-admin-password.txt
+   Read it with:
+     sudo cat /var/lib/netcontrol/initial-admin-password.txt
+   It is removed after the first administrator login.
+
+3. Local enforcement uses the restricted helper:
+     /usr/lib/netcontrol/netcontrol-helper
+   The sudoers rule at /etc/sudoers.d/netcontrol allows only the netcontrol
+   service user to invoke it. Review it before enabling the service.
+
+4. For remote API access, configure TLS in
+   /var/lib/netcontrol/config.toml and set allow_remote = true.
+   Never expose the API over plaintext HTTP.
+
+Discovery and monitoring work without the helper. Blocking and bandwidth
+enforcement require a configured, authorized gateway.
+EOF
+}
+
+post_upgrade() {
+  post_install
+}
+
+pre_remove() {
+  systemctl stop netcontrol.service 2>/dev/null || true
+}

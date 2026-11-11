@@ -1,0 +1,25 @@
+[package]
+name = "netcontrol-desktop"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "NetControl desktop application backend"
+
+[lib]
+name = "netcontrol_desktop_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+netcontrol-core = { path = "../../../crates/netcontrol-core" }
+netcontrol-discovery = { path = "../../../crates/netcontrol-discovery" }
+netcontrol-gateway = { path = "../../../crates/netcontrol-gateway" }
+netcontrol-service = { path = "../../../crates/netcontrol-service" }
+serde.workspace = true
+serde_json.workspace = true
+tauri = { version = "2", features = [] }
+tokio.workspace = true

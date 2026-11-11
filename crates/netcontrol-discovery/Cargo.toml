@@ -1,0 +1,27 @@
+[package]
+name = "netcontrol-discovery"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Interface detection and multi-method LAN discovery engine for NetControl"
+
+[dependencies]
+netcontrol-core = { path = "../netcontrol-core" }
+async-trait.workspace = true
+chrono.workspace = true
+futures.workspace = true
+ipnet.workspace = true
+ipnetwork = "0.20"
+libc.workspace = true
+pnet_datalink = "0.35"
+quick-xml.workspace = true
+rand.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+socket2.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+uuid.workspace = true

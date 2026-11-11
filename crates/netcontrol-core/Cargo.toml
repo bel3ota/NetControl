@@ -1,0 +1,31 @@
+[package]
+name = "netcontrol-core"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Domain models, persistence, configuration and security primitives for NetControl"
+
+[dependencies]
+aes-gcm = "0.10"
+argon2 = { version = "0.5", features = ["std"] }
+base64.workspace = true
+chrono.workspace = true
+dirs.workspace = true
+ipnet.workspace = true
+libc.workspace = true
+rand.workspace = true
+rusqlite.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+subtle = "2.6"
+thiserror.workspace = true
+toml.workspace = true
+tracing.workspace = true
+uuid.workspace = true
+zeroize.workspace = true
+
+[dev-dependencies]
+tempfile = "3.13"
