@@ -20,7 +20,7 @@ export const CATEGORY_LABEL: Record<string, string> = {
 };
 
 export function formatBytes(bytes: number | null | undefined, perSecond = false): string {
-  if (bytes === null || bytes === undefined || !Number.isFinite(bytes)) return "—";
+  if (bytes === null || bytes === undefined || !Number.isFinite(bytes)) return "-";
   const units = ["B", "KB", "MB", "GB", "TB"];
   let value = Math.max(0, bytes);
   let idx = 0;
@@ -33,7 +33,7 @@ export function formatBytes(bytes: number | null | undefined, perSecond = false)
 }
 
 export function formatBps(bps: number | null | undefined): string {
-  if (bps === null || bps === undefined || !Number.isFinite(bps)) return "—";
+  if (bps === null || bps === undefined || !Number.isFinite(bps)) return "-";
   const units = ["bps", "Kbps", "Mbps", "Gbps", "Tbps"];
   let value = Math.max(0, bps);
   let idx = 0;
@@ -52,9 +52,9 @@ export function formatKbps(kbps: number | null | undefined): string {
 }
 
 export function relativeTime(iso: string | null | undefined): string {
-  if (!iso) return "—";
+  if (!iso) return "-";
   const then = new Date(iso).getTime();
-  if (!Number.isFinite(then)) return "—";
+  if (!Number.isFinite(then)) return "-";
   const seconds = Math.max(0, Math.floor((Date.now() - then) / 1000));
   if (seconds < 10) return "just now";
   if (seconds < 60) return `${seconds}s ago`;
@@ -64,7 +64,7 @@ export function relativeTime(iso: string | null | undefined): string {
 }
 
 export function formatDate(iso: string | null | undefined): string {
-  if (!iso) return "—";
+  if (!iso) return "-";
   const date = new Date(iso);
   if (!Number.isFinite(date.getTime())) return iso;
   return date.toLocaleString(undefined, {

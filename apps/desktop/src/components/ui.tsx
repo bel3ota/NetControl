@@ -174,7 +174,7 @@ export function EnforcementBadge({ state }: { state: EnforcementState }) {
     case "expired":
       return <Pill>Expired</Pill>;
     default:
-      return <span className="text-xs text-faint">—</span>;
+      return <span className="text-xs text-faint">-</span>;
   }
 }
 
@@ -562,7 +562,7 @@ export function Rate({
 }
 
 export function LimitLabel({ down, up }: { down: number | null; up: number | null }) {
-  if (down === null && up === null) return <span className="text-xs text-faint">—</span>;
+  if (down === null && up === null) return <span className="text-xs text-faint">-</span>;
   return (
     <span className="mono text-[11px] text-muted">
       ↓ {formatKbps(down)} <span className="mx-1 text-faint">·</span> ↑ {formatKbps(up)}

@@ -240,7 +240,7 @@ export function Gateways({ onChanged }: { onChanged: () => void }) {
                   </div>
                   <div>
                     <p className="eyebrow">Version</p>
-                    <p className="mt-1 text-xs text-ink">{probe.version || "—"}</p>
+                    <p className="mt-1 text-xs text-ink">{probe.version || "-"}</p>
                   </div>
                   <div>
                     <p className="eyebrow">Latency</p>

@@ -110,12 +110,12 @@ fun DashboardScreen(
                     }
                     Spacer(Modifier.height(14.dp))
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        MetaChip("SUBNET", network?.cidr ?: "—", Modifier.weight(1f))
-                        MetaChip("GATEWAY", network?.gateway ?: "—", Modifier.weight(1f))
+                        MetaChip("SUBNET", network?.cidr ?: "-", Modifier.weight(1f))
+                        MetaChip("GATEWAY", network?.gateway ?: "-", Modifier.weight(1f))
                     }
                     Spacer(Modifier.height(8.dp))
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        MetaChip("INTERFACE", network?.iface ?: "—", Modifier.weight(1f))
+                        MetaChip("INTERFACE", network?.iface ?: "-", Modifier.weight(1f))
                         MetaChip(
                             "LAST SCAN",
                             dashboard?.lastScan?.let { relativeTime(it.startedAt) } ?: "never",
@@ -223,7 +223,7 @@ fun DashboardScreen(
                         )
                         Spacer(Modifier.weight(1f))
                         Text(
-                            "↓ ${dashboard?.traffic?.rxTotal?.let { formatBytes(it) } ?: "—"}   ↑ ${dashboard?.traffic?.txTotal?.let { formatBytes(it) } ?: "—"}",
+                            "↓ ${dashboard?.traffic?.rxTotal?.let { formatBytes(it) } ?: "-"}   ↑ ${dashboard?.traffic?.txTotal?.let { formatBytes(it) } ?: "-"}",
                             style = MaterialTheme.typography.labelSmall,
                             color = Faint,
                         )
@@ -391,7 +391,7 @@ fun DeviceRow(device: Device, onClick: () -> Unit) {
                     )
                 }
                 Text(
-                    "${device.ip ?: "—"} · ${device.vendor ?: "vendor unknown"}",
+                    "${device.ip ?: "-"} · ${device.vendor ?: "vendor unknown"}",
                     style = MaterialTheme.typography.bodySmall,
                     color = Faint,
                     maxLines = 1,

@@ -18,7 +18,7 @@ optdepends=(
 install=netcontrol.install
 backup=()
 source=("netcontrol-$pkgver.tar.gz")
-sha256sums=('29716fdf0b3bd41ba118caebee18078704d788192229020be349c9aa93376863')
+sha256sums=('6201dcf0e38b6306f017e4d5392c5b913fb6529f68eb976705abf9827b0e7f71')
 
 build() {
   cd "$srcdir/netcontrol-$pkgver"

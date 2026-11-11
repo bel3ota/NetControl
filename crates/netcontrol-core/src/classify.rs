@@ -2,7 +2,7 @@
 //!
 //! Classification combines three independent signals: IEEE vendor, hostname
 //! conventions and observed services/ports. Scores are intentionally
-//! conservative — an unknown device is better than a wrong label — and every
+//! conservative - an unknown device is better than a wrong label - and every
 //! result carries the reasons so the UI can explain itself.
 
 use crate::models::DeviceCategory;

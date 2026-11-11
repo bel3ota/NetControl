@@ -205,11 +205,11 @@ export function ScanDialog({
               </div>
               <div>
                 <p className="eyebrow">Gateway</p>
-                <p className="mt-1 mono text-[11px] text-ink">{target.gateway4 || "—"}</p>
+                <p className="mt-1 mono text-[11px] text-ink">{target.gateway4 || "-"}</p>
               </div>
               <div className="min-w-0">
                 <p className="eyebrow">SSID</p>
-                <p className="mt-1 truncate text-[11px] text-ink">{target.ssid || "—"}</p>
+                <p className="mt-1 truncate text-[11px] text-ink">{target.ssid || "-"}</p>
               </div>
             </div>
           )}

@@ -25,8 +25,8 @@ class FormattingTest {
 
     @Test
     fun handlesBadTimestamps() {
-        assertEquals("—", relativeTime(null))
-        assertEquals("—", relativeTime("not-a-time"))
+        assertEquals("-", relativeTime(null))
+        assertEquals("-", relativeTime("not-a-time"))
         assertTrue(relativeTime(java.time.Instant.now().toString()).isNotBlank())
     }
 }

@@ -373,14 +373,14 @@ export function Settings({
                 <Server size={16} className="text-azure" />
               </div>
               <div className="divide-y divide-line/60">
-                <Row label="Version" value={status?.version ?? "—"} />
-                <Row label="Host" value={status?.hostname ?? "—"} />
-                <Row label="Platform" value={status?.platform ?? "—"} />
-                <Row label="Uptime" value={status ? `${Math.floor(status.uptime_seconds / 60)}m` : "—"} />
+                <Row label="Version" value={status?.version ?? "-"} />
+                <Row label="Host" value={status?.hostname ?? "-"} />
+                <Row label="Platform" value={status?.platform ?? "-"} />
+                <Row label="Uptime" value={status ? `${Math.floor(status.uptime_seconds / 60)}m` : "-"} />
                 <Row label="Listen" value={status?.listening ?? "local desktop"} />
                 <Row label="TLS" value={status?.tls ? "enabled" : "loopback only"} />
                 <Row label="Privileged probes" value={status?.privileged ? "available" : "unprivileged"} />
-                <Row label="Database" value={status?.database ?? "—"} mono />
+                <Row label="Database" value={status?.database ?? "-"} mono />
               </div>
             </section>
 

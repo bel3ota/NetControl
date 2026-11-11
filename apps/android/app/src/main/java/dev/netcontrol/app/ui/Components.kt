@@ -276,7 +276,7 @@ fun formatKbps(kbps: Long?): String {
 }
 
 fun relativeTime(iso: String?): String {
-    if (iso.isNullOrBlank()) return "—"
+    if (iso.isNullOrBlank()) return "-"
     return runCatching {
         val then = Instant.parse(iso)
         val seconds = Duration.between(then, Instant.now()).seconds.coerceAtLeast(0)
@@ -287,11 +287,11 @@ fun relativeTime(iso: String?): String {
             seconds < 86400 -> "${seconds / 3600}h ago"
             else -> "${seconds / 86400}d ago"
         }
-    }.getOrDefault("—")
+    }.getOrDefault("-")
 }
 
 fun shortDate(iso: String?): String {
-    if (iso.isNullOrBlank()) return "—"
+    if (iso.isNullOrBlank()) return "-"
     return runCatching {
         val instant = Instant.parse(iso)
         val formatter = java.time.format.DateTimeFormatter.ofPattern("MMM d, HH:mm")

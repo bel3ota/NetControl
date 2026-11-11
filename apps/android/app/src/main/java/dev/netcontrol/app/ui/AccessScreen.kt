@@ -239,7 +239,7 @@ private fun AccessDeviceCard(
                     )
                 }
                 Text(
-                    subtitle ?: "${device.ip ?: "—"} · ${relativeTime(device.lastSeen)}",
+                    subtitle ?: "${device.ip ?: "-"} · ${relativeTime(device.lastSeen)}",
                     style = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace),
                     color = Faint,
                     maxLines = 1,

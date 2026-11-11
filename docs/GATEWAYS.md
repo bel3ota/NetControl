@@ -76,7 +76,7 @@ Bandwidth:
 - Upload: ingress police filter matching source `/32`.
 - The adapter refuses to replace an existing non-NetControl root qdisc
   (`mq`, `cake`, `hfsc`, ...) to avoid destroying existing QoS.
-- Priority maps to the HTB class `prio` 0–7.
+- Priority maps to the HTB class `prio` 0-7.
 
 ### Setup
 
@@ -216,7 +216,7 @@ netcontrol gateway add \
 - Block: `easyrule block <iface> <ip>`; verified with `pfctl -sr` (it must show a
   blocking rule containing the address).
 - Unblock: `easyrule unblock <iface> <ip>` and verify the rule is gone.
-- Bandwidth: not automated — reported as unsupported rather than pretending.
+- Bandwidth: not automated - reported as unsupported rather than pretending.
 
 ## OPNsense
 

@@ -57,7 +57,7 @@ are authorized to scan.
    unreachable; `ok` indicates readiness, not feature support.
 4. Every mutation must read back the gateway state and set `verified`.
 5. Return `EnforcementResult::unsupported` for features the adapter does not
-   implement — never a fake success.
+   implement - never a fake success.
 6. Add the factory arm in `lib.rs`.
 7. Add unit tests for framing/parsing/generated arguments. If possible, provide
    an integration test with a mock server.

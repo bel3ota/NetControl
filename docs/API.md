@@ -154,7 +154,7 @@ curl -s -X POST "$BASE/devices/<id>/bandwidth" -H "$AUTH" \
   -d '{"confirm":true,"download_kbps":10000,"upload_kbps":2000,"priority":3}'
 ```
 
-Rates are Kbps. `null` means no limit for that direction. Priority is 0–7 where
+Rates are Kbps. `null` means no limit for that direction. Priority is 0-7 where
 supported. Clear with `DELETE` and `{"confirm":true}`.
 
 ### Gateway

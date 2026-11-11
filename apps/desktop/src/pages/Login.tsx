@@ -66,7 +66,7 @@ export function Login({ onLogin }: { onLogin: (user: UserSummary) => void }) {
           </h1>
           <p className="mt-5 max-w-md text-sm leading-relaxed text-muted">
             One shared discovery and enforcement engine for Windows, Linux and Android.
-            Real ARP, ICMP and mDNS discovery. Real router-enforced access control — never
+            Real ARP, ICMP and mDNS discovery. Real router-enforced access control - never
             simulated.
           </p>
           <div className="mt-8 grid max-w-md grid-cols-3 gap-3">

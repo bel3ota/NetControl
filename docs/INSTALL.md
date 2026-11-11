@@ -7,7 +7,7 @@ Windows installer must be built on Windows.
 
 ---
 
-## 1. Arch Linux / Omarchy — from source
+## 1. Arch Linux / Omarchy - from source
 
 ### Dependencies
 
@@ -177,7 +177,7 @@ apps\desktop\src-tauri\target\release\bundle\msi\*.msi
 apps\desktop\src-tauri\target\release\bundle\nsis\*.exe
 ```
 
-A GitHub Actions workflow is included at `.github/workflows/windows.yml`; run it
+A GitHub Actions workflow is included at `.github/workflows/build-artifacts.yml`; run it
 manually or on a tag and download the `netcontrol-windows` artifact. The
 installer is **not** produced by the Linux development environment used for this
 repository. See [../packaging/windows/BUILD.md](../packaging/windows/BUILD.md).

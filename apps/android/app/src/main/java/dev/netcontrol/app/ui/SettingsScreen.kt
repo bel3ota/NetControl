@@ -106,7 +106,7 @@ fun SettingsScreen(
                     Icon(Icons.Outlined.Cloud, null, tint = Faint, modifier = Modifier.size(14.dp))
                     Spacer(Modifier.width(7.dp))
                     Text(
-                        serverUrl ?: "—",
+                        serverUrl ?: "-",
                         style = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace),
                         color = Muted,
                         maxLines = 1,

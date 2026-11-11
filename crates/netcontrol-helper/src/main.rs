@@ -1,4 +1,4 @@
-//! `netcontrol-helper` — the only privileged component.
+//! `netcontrol-helper` - the only privileged component.
 //!
 //! It reads one JSON request from stdin, validates every field, performs a
 //! whitelisted nftables/tc operation, and prints one JSON response. It is

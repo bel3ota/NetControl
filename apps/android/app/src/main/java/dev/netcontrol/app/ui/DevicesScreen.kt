@@ -339,7 +339,7 @@ private fun DeviceListCard(device: Device, onClick: () -> Unit) {
                     )
                 }
                 Text(
-                    "${device.ip ?: "—"}  ·  ${categoryLabel(device.category)}",
+                    "${device.ip ?: "-"}  ·  ${categoryLabel(device.category)}",
                     style = MaterialTheme.typography.bodySmall,
                     color = Faint,
                     modifier = Modifier.padding(top = 2.dp),
@@ -501,7 +501,7 @@ private fun SheetInfo(label: String, value: String?) {
     Row(Modifier.fillMaxWidth().padding(vertical = 5.dp)) {
         Text(label, style = MaterialTheme.typography.bodySmall, color = Faint, modifier = Modifier.weight(1f))
         Text(
-            value ?: "—",
+            value ?: "-",
             style = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace),
             color = Ink,
             maxLines = 2,
@@ -674,7 +674,7 @@ private fun LimitDialog(
                 OutlinedTextField(
                     value = priority,
                     onValueChange = { priority = it.filter(Char::isDigit) },
-                    label = { Text("Priority 0–7 (optional)", style = MaterialTheme.typography.bodySmall) },
+                    label = { Text("Priority 0-7 (optional)", style = MaterialTheme.typography.bodySmall) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),

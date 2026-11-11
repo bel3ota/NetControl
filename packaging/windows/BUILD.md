@@ -3,12 +3,12 @@
 Tauri cannot produce a Windows MSI/NSIS installer from a Linux host without a
 Windows build environment (WebView2, the MSVC toolchain, and the WiX/NSIS
 bundlers are Windows components). The complete CI workflow is included at
-`.github/workflows/windows.yml`; it builds both installers on `windows-latest`.
+`.github/workflows/build-artifacts.yml`; it builds both installers on `windows-latest`.
 
 ## Option A: GitHub Actions (recommended)
 
 1. Push the repository to GitHub.
-2. Run the **Windows desktop installer** workflow manually.
+2. The workflow runs on every push and can also be started manually.
 3. Download the `netcontrol-windows` artifact:
    - `NetControl_0.1.0_x64_en-US.msi`
    - `NetControl_0.1.0_x64-setup.exe`

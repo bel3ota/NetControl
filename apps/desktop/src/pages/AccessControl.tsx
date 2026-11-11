@@ -235,7 +235,7 @@ export function AccessControl({
                         {formatKbps(device.limit_upload_kbps)}
                       </td>
                       <td className="px-4 py-2.5 text-[11px] text-muted">
-                        {device.priority ?? "—"}
+                        {device.priority ?? "-"}
                       </td>
                       <td className="px-4 py-2.5 text-[10px] text-faint">
                         {device.limit_expires_at ? formatDate(device.limit_expires_at) : "no expiry"}
@@ -293,7 +293,7 @@ export function AccessControl({
                         <p className="text-[11px] text-ink">
                           {device ? deviceName(device) : rule.ip || rule.mac || "unknown"}
                         </p>
-                        <p className="mono text-[9px] text-faint">{rule.ip || rule.mac || "—"}</p>
+                        <p className="mono text-[9px] text-faint">{rule.ip || rule.mac || "-"}</p>
                       </td>
                       <td className="px-4 py-2.5">
                         <EnforcementBadge state={rule.state} />
@@ -301,7 +301,7 @@ export function AccessControl({
                       <td className="px-4 py-2.5 text-[10px] text-muted">{rule.created_by || "system"}</td>
                       <td className="max-w-[280px] px-4 py-2.5">
                         <p className="truncate text-[10px] text-faint" title={rule.last_error || ""}>
-                          {rule.last_error || "—"}
+                          {rule.last_error || "-"}
                         </p>
                       </td>
                     </tr>
@@ -358,7 +358,7 @@ function DeviceCell({ device }: { device: Device }) {
           <Dot online={device.online} />
           <span className="max-w-[220px] truncate text-xs font-medium text-ink">{deviceName(device)}</span>
         </div>
-        <p className="mono mt-0.5 text-[10px] text-faint">{device.ip || device.mac || "—"}</p>
+        <p className="mono mt-0.5 text-[10px] text-faint">{device.ip || device.mac || "-"}</p>
       </div>
     </div>
   );
@@ -395,8 +395,8 @@ function DeviceList({
                 <DeviceCell device={device} />
               </td>
               <td className="px-4 py-2.5">
-                <p className="mono text-[11px] text-ink">{device.ip || "—"}</p>
-                <p className="mono text-[9px] text-faint">{device.mac || "—"}</p>
+                <p className="mono text-[11px] text-ink">{device.ip || "-"}</p>
+                <p className="mono text-[9px] text-faint">{device.mac || "-"}</p>
               </td>
               <td className="px-4 py-2.5">
                 <AccessBadge blocked={device.is_blocked} trusted={device.is_trusted} />

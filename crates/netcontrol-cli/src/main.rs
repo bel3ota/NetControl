@@ -1,4 +1,4 @@
-//! `netcontrol` — NetControl command line interface.
+//! `netcontrol` - NetControl command line interface.
 //!
 //! Runs the shared engine locally against the same SQLite database and gateway
 //! adapters used by the service and desktop app. Disruptive actions require an
@@ -28,7 +28,7 @@ use std::time::Duration;
 #[command(
     name = "netcontrol",
     version,
-    about = "NetControl — authorized LAN discovery, monitoring and access management",
+    about = "NetControl - authorized LAN discovery, monitoring and access management",
     long_about = None
 )]
 struct Cli {
@@ -482,7 +482,7 @@ fn enforcement_note(style: &Style, device: &Device) -> String {
         netcontrol_core::models::EnforcementState::Unsupported => style.yellow("unsupported"),
         netcontrol_core::models::EnforcementState::Pending => style.yellow("pending"),
         netcontrol_core::models::EnforcementState::Expired => style.dim("expired"),
-        netcontrol_core::models::EnforcementState::None => style.dim("—"),
+        netcontrol_core::models::EnforcementState::None => style.dim("-"),
     }
 }
 
@@ -503,23 +503,23 @@ fn device_table(style: &Style, items: &[Device]) -> String {
     ]);
     for device in items {
         let limit = match (device.limit_download_kbps, device.limit_upload_kbps) {
-            (None, None) => style.dim("—"),
+            (None, None) => style.dim("-"),
             (down, up) => format!(
                 "↓{} ↑{}",
-                down.map(format_kbps).unwrap_or_else(|| "—".into()),
-                up.map(format_kbps).unwrap_or_else(|| "—".into())
+                down.map(format_kbps).unwrap_or_else(|| "-".into()),
+                up.map(format_kbps).unwrap_or_else(|| "-".into())
             ),
         };
         table.add_row(vec![
             Cell::new(status_dot(style, device.online)),
             Cell::new(device.display_name()),
-            Cell::new(device.ip.clone().unwrap_or_else(|| "—".into())),
-            Cell::new(device.mac.clone().unwrap_or_else(|| "—".into())),
+            Cell::new(device.ip.clone().unwrap_or_else(|| "-".into())),
+            Cell::new(device.mac.clone().unwrap_or_else(|| "-".into())),
             Cell::new(
                 device
                     .vendor
                     .clone()
-                    .unwrap_or_else(|| "—".into())
+                    .unwrap_or_else(|| "-".into())
                     .chars()
                     .take(28)
                     .collect::<String>(),
@@ -613,9 +613,9 @@ async fn dashboard(ctx: &Ctx, state: &Arc<AppState>) -> Result<()> {
             println!(
                 "  {}  {}   DNS {}",
                 s.cyan("GATEWAY"),
-                net.gateway.clone().unwrap_or_else(|| "—".into()),
+                net.gateway.clone().unwrap_or_else(|| "-".into()),
                 if net.dns.is_empty() {
-                    "—".to_string()
+                    "-".to_string()
                 } else {
                     net.dns.join(", ")
                 }
@@ -650,7 +650,7 @@ async fn dashboard(ctx: &Ctx, state: &Arc<AppState>) -> Result<()> {
             println!(
                 "  {} {}",
                 s.cyan("TRAFFIC"),
-                s.dim("no live measurement yet — run `netcontrol monitor`")
+                s.dim("no live measurement yet - run `netcontrol monitor`")
             );
         }
     }
@@ -674,12 +674,12 @@ async fn dashboard(ctx: &Ctx, state: &Arc<AppState>) -> Result<()> {
         None => println!(
             "  {} {}",
             s.cyan("GATEWAY"),
-            s.yellow("not configured — discovery and monitoring only (see `netcontrol gateway add --help`)")
+            s.yellow("not configured - discovery and monitoring only (see `netcontrol gateway add --help`)")
         ),
     }
     if let Some(scan) = last_scan {
         println!(
-            "  {} {} on {} — {} hosts",
+            "  {} {} on {} - {} hosts",
             s.cyan("LAST SCAN"),
             scan.started_at,
             scan.interface,
@@ -698,7 +698,7 @@ async fn dashboard(ctx: &Ctx, state: &Arc<AppState>) -> Result<()> {
             println!(
                 "  {}",
                 s.dim(&format!(
-                    "showing {} of {} — use `netcontrol devices`",
+                    "showing {} of {} - use `netcontrol devices`",
                     page.items.len(),
                     page.total
                 ))
@@ -757,15 +757,15 @@ async fn interfaces(ctx: &Ctx) -> Result<()> {
             },
             iface.name,
             iface.kind.to_string(),
-            iface.mac.unwrap_or_else(|| "—".into()),
+            iface.mac.unwrap_or_else(|| "-".into()),
             iface
                 .ipv4
                 .iter()
                 .map(|v| v.cidr.clone())
                 .collect::<Vec<_>>()
                 .join(", "),
-            iface.gateway4.unwrap_or_else(|| "—".into()),
-            iface.ssid.unwrap_or_else(|| "—".into()),
+            iface.gateway4.unwrap_or_else(|| "-".into()),
+            iface.ssid.unwrap_or_else(|| "-".into()),
         ]);
     }
     println!("{table}");
@@ -819,7 +819,7 @@ async fn scan_command(ctx: &Ctx, state: &Arc<AppState>, args: ScanArgs) -> Resul
             println!(
                 "  gateway {}  ssid {}",
                 gw,
-                net.ssid.clone().unwrap_or_else(|| "—".into())
+                net.ssid.clone().unwrap_or_else(|| "-".into())
             );
         }
     }
@@ -999,22 +999,22 @@ async fn device_command(ctx: &Ctx, state: &Arc<AppState>, args: DeviceArgs) -> R
             println!(
                 "  {:<14} {}",
                 "IP",
-                device.ip.clone().unwrap_or_else(|| "—".into())
+                device.ip.clone().unwrap_or_else(|| "-".into())
             );
             println!(
                 "  {:<14} {}",
                 "IPv6",
-                device.ipv6.clone().unwrap_or_else(|| "—".into())
+                device.ipv6.clone().unwrap_or_else(|| "-".into())
             );
             println!(
                 "  {:<14} {}",
                 "MAC",
-                device.mac.clone().unwrap_or_else(|| "—".into())
+                device.mac.clone().unwrap_or_else(|| "-".into())
             );
             println!(
                 "  {:<14} {}",
                 "Vendor",
-                device.vendor.clone().unwrap_or_else(|| "—".into())
+                device.vendor.clone().unwrap_or_else(|| "-".into())
             );
             println!(
                 "  {:<14} {} ({:?})",
@@ -1025,12 +1025,12 @@ async fn device_command(ctx: &Ctx, state: &Arc<AppState>, args: DeviceArgs) -> R
             println!(
                 "  {:<14} {}",
                 "Interface",
-                device.interface.clone().unwrap_or_else(|| "—".into())
+                device.interface.clone().unwrap_or_else(|| "-".into())
             );
             println!(
                 "  {:<14} {}",
                 "SSID",
-                device.ssid.clone().unwrap_or_else(|| "—".into())
+                device.ssid.clone().unwrap_or_else(|| "-".into())
             );
             println!("  {:<14} {}", "First seen", device.first_seen);
             println!(
@@ -1054,11 +1054,11 @@ async fn device_command(ctx: &Ctx, state: &Arc<AppState>, args: DeviceArgs) -> R
                     device
                         .limit_download_kbps
                         .map(format_kbps)
-                        .unwrap_or_else(|| "—".into()),
+                        .unwrap_or_else(|| "-".into()),
                     device
                         .limit_upload_kbps
                         .map(format_kbps)
-                        .unwrap_or_else(|| "—".into())
+                        .unwrap_or_else(|| "-".into())
                 );
             }
             if let Some(traffic) = &traffic {
@@ -1216,7 +1216,7 @@ async fn monitor_command(ctx: &Ctx, state: &Arc<AppState>, args: MonitorArgs) ->
     let s = &ctx.style;
     let mut ticker = tokio::time::interval(Duration::from_secs(args.interval.max(1)));
     println!(
-        "{} {} — Ctrl-C to stop",
+        "{} {} - Ctrl-C to stop",
         s.bold("Monitoring"),
         iface.display()
     );
@@ -1400,7 +1400,7 @@ trait UrlOrEmpty {
 
 impl UrlOrEmpty for Option<String> {
     fn url_or_empty(&self) -> String {
-        self.clone().unwrap_or_else(|| "—".into())
+        self.clone().unwrap_or_else(|| "-".into())
     }
 }
 
@@ -1488,7 +1488,7 @@ fn print_action(ctx: &Ctx, result: &EnforcementResult, device: &Device) -> Resul
     println!();
     if result.success && result.verified {
         println!(
-            "{} {} — {}",
+            "{} {} - {}",
             s.green("✓ VERIFIED"),
             result.action,
             device.display_name()
@@ -1505,11 +1505,11 @@ fn print_action(ctx: &Ctx, result: &EnforcementResult, device: &Device) -> Resul
                 device
                     .limit_download_kbps
                     .map(format_kbps)
-                    .unwrap_or_else(|| "—".into()),
+                    .unwrap_or_else(|| "-".into()),
                 device
                     .limit_upload_kbps
                     .map(format_kbps)
-                    .unwrap_or_else(|| "—".into())
+                    .unwrap_or_else(|| "-".into())
             );
         }
         Ok(())
@@ -1572,7 +1572,7 @@ async fn gateway_command(ctx: &Ctx, state: &Arc<AppState>, args: GatewayArgs) ->
                     gateway.kind.to_string(),
                     gateway.host,
                     gateway.port.to_string(),
-                    gateway.interface_hint.unwrap_or_else(|| "—".into()),
+                    gateway.interface_hint.unwrap_or_else(|| "-".into()),
                 ]);
             }
             println!("{table}");
@@ -1648,10 +1648,10 @@ async fn gateway_command(ctx: &Ctx, state: &Arc<AppState>, args: GatewayArgs) ->
                     } else {
                         s.dim("○")
                     },
-                    client.ip.unwrap_or_else(|| "—".into()),
-                    client.mac.unwrap_or_else(|| "—".into()),
-                    client.hostname.unwrap_or_else(|| "—".into()),
-                    client.vendor.unwrap_or_else(|| "—".into()),
+                    client.ip.unwrap_or_else(|| "-".into()),
+                    client.mac.unwrap_or_else(|| "-".into()),
+                    client.hostname.unwrap_or_else(|| "-".into()),
+                    client.vendor.unwrap_or_else(|| "-".into()),
                 ]);
             }
             println!("{table}");
@@ -1671,14 +1671,14 @@ fn print_probe(ctx: &Ctx, probe: &GatewayProbe) {
     println!();
     if probe.ok {
         println!(
-            "{} {} ({}) — {}ms",
+            "{} {} ({}) - {}ms",
             s.green("✓"),
             probe.name,
             probe.kind,
             probe.latency_ms
         );
     } else {
-        println!("{} {} — {}", s.red("✗"), probe.name, probe.message);
+        println!("{} {} - {}", s.red("✗"), probe.name, probe.message);
         return;
     }
     if let Some(version) = &probe.version {
@@ -1917,7 +1917,7 @@ async fn admin_command(ctx: &Ctx, state: &Arc<AppState>, args: AdminArgs) -> Res
 
 async fn interactive(ctx: &Ctx, state: &Arc<AppState>) -> Result<()> {
     println!(
-        "{} interactive mode — type {} for commands, {} to quit",
+        "{} interactive mode - type {} for commands, {} to quit",
         ctx.style.bold("NetControl"),
         ctx.style.cyan("help"),
         ctx.style.cyan("quit")
@@ -2279,14 +2279,14 @@ fn print_remote_action(ctx: &Ctx, value: &serde_json::Value) -> Result<()> {
 
 fn print_remote_dashboard(ctx: &Ctx, dash: &netcontrol_core::models::DashboardSummary) {
     let s = &ctx.style;
-    println!("{}", s.bold("  NetControl — remote"));
+    println!("{}", s.bold("  NetControl - remote"));
     if let Some(net) = &dash.network {
         println!(
             "  {} {}   gateway {}   ssid {}",
             s.cyan("NETWORK"),
             net.cidr,
-            net.gateway.clone().unwrap_or_else(|| "—".into()),
-            net.ssid.clone().unwrap_or_else(|| "—".into())
+            net.gateway.clone().unwrap_or_else(|| "-".into()),
+            net.ssid.clone().unwrap_or_else(|| "-".into())
         );
     }
     println!(

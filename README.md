@@ -1,19 +1,19 @@
 # NetControl
 
-**Authorized network discovery, monitoring and verified access control — one Rust engine, three interfaces.**
+**Authorized network discovery, monitoring and verified access control - one Rust engine, three interfaces.**
 
-NetControl discovers every device on the network the administrator is connected to, identifies it from IEEE OUI data and service fingerprints, keeps a persistent history, measures real interface traffic, and enforces blocking or bandwidth limits **through an authorized gateway** — verifying every change by reading the gateway state back.
+NetControl discovers every device on the network the administrator is connected to, identifies it from IEEE OUI data and service fingerprints, keeps a persistent history, measures real interface traffic, and enforces blocking or bandwidth limits **through an authorized gateway** - verifying every change by reading the gateway state back.
 
 > If NetControl cannot verify a change, it reports it as unsupported or failed. It never marks a device blocked or limited unless the gateway confirms it.
 
 ![Desktop dashboard](screenshots/02-dashboard.png)
 
-| Desktop — Devices | Linux CLI |
+| Desktop - Devices | Linux CLI |
 | --- | --- |
 | ![Devices](screenshots/03-devices.png) | ![CLI](screenshots/20-cli.png) |
-| **Desktop — Monitoring** | **Android — Dashboard** |
+| **Desktop - Monitoring** | **Android - Dashboard** |
 | ![Monitoring](screenshots/05-monitoring.png) | ![Android](screenshots/12-android-dashboard.png) |
-| **Android — Devices** | **Android — Scan result** |
+| **Android - Devices** | **Android - Scan result** |
 | ![Android devices](screenshots/13-android-devices.png) | ![Android scan](screenshots/18-android-scan-result.png) |
 
 More screenshots: [`screenshots/`](screenshots/).
@@ -52,7 +52,7 @@ limit 10/2 Mbps       → verified=true,  tc htb class 1:50 + u32 filters presen
 unblock / clear       → verified=true,  objects removed
 ```
 
-The helper is the only privileged component and accepts a JSON allowlist — it never runs a shell. See [docs/GATEWAYS.md](docs/GATEWAYS.md).
+The helper is the only privileged component and accepts a JSON allowlist - it never runs a shell. See [docs/GATEWAYS.md](docs/GATEWAYS.md).
 
 ---
 
@@ -151,6 +151,19 @@ netcontrol serve --listen 0.0.0.0:8787 \
 NetControl refuses an unencrypted non-loopback listener unless
 `NETCONTROL_ALLOW_INSECURE_REMOTE=1` is explicitly set for an isolated lab.
 
+### Automatic builds on GitHub
+
+Every push builds both deliverables in GitHub Actions:
+
+- **Windows:** `NetControl_<version>_x64_en-US.msi` and `NetControl_<version>_x64-setup.exe`
+- **Android:** `netcontrol-android-debug.apk`
+
+Open the workflow run under **Actions > Build Windows installers and Android APK**
+and download the `netcontrol-windows` or `netcontrol-android-apk` artifact.
+Pushing a tag such as `v0.1.0` also creates a GitHub Release with both artifacts
+attached. The workflow file is
+[`.github/workflows/build-artifacts.yml`](.github/workflows/build-artifacts.yml).
+
 ### 5. Desktop
 
 ```bash
@@ -160,7 +173,7 @@ npm run dev          # browser UI against the service
 npm run tauri dev    # native Tauri window (local shared engine)
 ```
 
-Windows installers: [packaging/windows/BUILD.md](packaging/windows/BUILD.md) / [`.github/workflows/windows.yml`](.github/workflows/windows.yml).
+Windows installers: [packaging/windows/BUILD.md](packaging/windows/BUILD.md) / [`.github/workflows/build-artifacts.yml`](.github/workflows/build-artifacts.yml).
 
 ### 6. Android
 
@@ -172,7 +185,7 @@ adb install -r deliverables/netcontrol-android-debug.apk
 
 On an emulator use `http://10.0.2.2:8787/api/v1`; on a physical device use the
 service's LAN address (HTTPS strongly recommended). Android never performs
-enforcement itself — it controls an authorized service.
+enforcement itself - it controls an authorized service.
 
 Build it yourself:
 
@@ -187,14 +200,14 @@ See [docs/INSTALL.md](docs/INSTALL.md) for SDK versions and exact JDK commands.
 
 ## Feature highlights
 
-- **Network detection without assumptions** — no hard-coded `192.168.1.0/24`; reads CIDR, gateway, DNS, MAC and interface kind from the host, supports multiple simultaneous default routes.
-- **Five discovery methods** — neighbor/NDP, unprivileged ARP priming, ICMP, mDNS, optional Nmap + explicit TCP ports.
-- **Persistent identity** — devices merged by MAC, history kept after disconnect, manual names/categories, trust and blacklist semantics.
-- **Premium dark UI** — custom design, no generic dashboard template; real charts from measured counters.
-- **Honest bandwidth** — distinguishes configured limits, measured traffic and unavailable telemetry. Never fabricates per-device rates.
-- **Verified enforcement** — adapter reads the rule back; only verified state is persisted as enforced.
-- **Extensible gateway layer** — one trait, six adapters, capabilities reported per adapter.
-- **Security-first** — Argon2id, AES-256-GCM credential sealing, SHA-256 session digests, scoped probing, audit log, HTTPS enforcement, CORS allowlist, input validation, helper allowlist.
+- **Network detection without assumptions** - no hard-coded `192.168.1.0/24`; reads CIDR, gateway, DNS, MAC and interface kind from the host, supports multiple simultaneous default routes.
+- **Five discovery methods** - neighbor/NDP, unprivileged ARP priming, ICMP, mDNS, optional Nmap + explicit TCP ports.
+- **Persistent identity** - devices merged by MAC, history kept after disconnect, manual names/categories, trust and blacklist semantics.
+- **Premium dark UI** - custom design, no generic dashboard template; real charts from measured counters.
+- **Honest bandwidth** - distinguishes configured limits, measured traffic and unavailable telemetry. Never fabricates per-device rates.
+- **Verified enforcement** - adapter reads the rule back; only verified state is persisted as enforced.
+- **Extensible gateway layer** - one trait, six adapters, capabilities reported per adapter.
+- **Security-first** - Argon2id, AES-256-GCM credential sealing, SHA-256 session digests, scoped probing, audit log, HTTPS enforcement, CORS allowlist, input validation, helper allowlist.
 
 ---
 
@@ -258,4 +271,4 @@ proving auth, confirmation requirements, the scope guard and the
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT - see [LICENSE](LICENSE).

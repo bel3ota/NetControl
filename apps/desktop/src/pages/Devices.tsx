@@ -314,8 +314,8 @@ export function Devices({
                       </div>
                     </td>
                     <td className="px-4 py-2.5">
-                      <p className="mono text-[11px] text-ink">{device.ip || "—"}</p>
-                      <p className="mono mt-0.5 text-[10px] text-faint">{device.mac || "—"}</p>
+                      <p className="mono text-[11px] text-ink">{device.ip || "-"}</p>
+                      <p className="mono mt-0.5 text-[10px] text-faint">{device.mac || "-"}</p>
                     </td>
                     <td className="px-4 py-2.5">
                       <Pill>{CATEGORY_LABEL[device.category] ?? device.category}</Pill>
@@ -380,7 +380,7 @@ export function Devices({
           <span className="text-[10px] text-faint">
             {total === 0
               ? "no records"
-              : `${offset + 1}–${Math.min(offset + items.length, total)} of ${total}`}
+              : `${offset + 1}-${Math.min(offset + items.length, total)} of ${total}`}
           </span>
           <div className="flex items-center gap-1">
             <button
@@ -666,7 +666,7 @@ function Info({ label, value, mono }: { label: string; value: string | null; mon
     <div className="rounded-xl border border-line bg-raised/40 p-2.5">
       <p className="text-[9px] uppercase tracking-wider text-faint">{label}</p>
       <p className={clsx("mt-1 break-all text-[11px] text-ink", mono && "mono text-[10px]")}>
-        {value || "—"}
+        {value || "-"}
       </p>
     </div>
   );

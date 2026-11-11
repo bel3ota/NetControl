@@ -167,9 +167,9 @@ export function Dashboard({
                 (network ? (network.kind === "wifi" ? "Wi-Fi network" : "Wired network") : "No interface")}
             </h2>
             <div className="mt-4 flex flex-wrap gap-x-7 gap-y-3">
-              <Metric icon={Network} label="Subnet" value={network?.cidr ?? "—"} />
-              <Metric icon={Router} label="Gateway" value={network?.gateway ?? "—"} />
-              <Metric icon={Globe2} label="DNS" value={network?.dns.join(", ") || "—"} />
+              <Metric icon={Network} label="Subnet" value={network?.cidr ?? "-"} />
+              <Metric icon={Router} label="Gateway" value={network?.gateway ?? "-"} />
+              <Metric icon={Globe2} label="DNS" value={network?.dns.join(", ") || "-"} />
               <Metric
                 icon={Clock3}
                 label="Last scan"
@@ -431,8 +431,8 @@ export function Dashboard({
                       </div>
                     </td>
                     <td className="px-4 py-2.5">
-                      <p className="mono text-[11px] text-ink">{device.ip || "—"}</p>
-                      <p className="mono mt-0.5 text-[10px] text-faint">{device.mac || "—"}</p>
+                      <p className="mono text-[11px] text-ink">{device.ip || "-"}</p>
+                      <p className="mono mt-0.5 text-[10px] text-faint">{device.mac || "-"}</p>
                     </td>
                     <td className="px-4 py-2.5">
                       <Pill>{device.category.replace("_", " ")}</Pill>

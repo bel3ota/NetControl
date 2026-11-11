@@ -104,14 +104,14 @@ export function Monitoring({ dashboard }: { dashboard: DashboardSummary | null }
       <div className="mb-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <LiveCard
           label="Download now"
-          value={overview ? formatBps(overview.rx_bps) : "—"}
+          value={overview ? formatBps(overview.rx_bps) : "-"}
           detail={`avg ${formatBps(avg.rx)} · peak ${formatBps(maxSample.rx)}`}
           icon={ArrowDownToLine}
           accent="text-mint"
         />
         <LiveCard
           label="Upload now"
-          value={overview ? formatBps(overview.tx_bps) : "—"}
+          value={overview ? formatBps(overview.tx_bps) : "-"}
           detail={`avg ${formatBps(avg.tx)} · peak ${formatBps(maxSample.tx)}`}
           icon={ArrowUpFromLine}
           accent="text-azure"
@@ -171,7 +171,7 @@ export function Monitoring({ dashboard }: { dashboard: DashboardSummary | null }
                 <MiniStat label="Bucket" value="1 minute average" />
                 <MiniStat
                   label="Last sample"
-                  value={overview ? formatDate(overview.sampled_at) : "—"}
+                  value={overview ? formatDate(overview.sampled_at) : "-"}
                 />
                 <MiniStat label="Source" value={overview?.source ?? "unavailable"} />
               </div>
@@ -210,7 +210,7 @@ export function Monitoring({ dashboard }: { dashboard: DashboardSummary | null }
                     {iface.ipv4[0]?.cidr ?? "no IPv4"}
                   </div>
                   <div className="mono text-[10px] text-faint">
-                    {iface.ipv4[0]?.address ?? "—"}
+                    {iface.ipv4[0]?.address ?? "-"}
                   </div>
                   <div className="flex items-center gap-1.5">
                     <Dot online />
