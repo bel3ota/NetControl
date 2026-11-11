@@ -155,7 +155,7 @@ NetControl refuses an unencrypted non-loopback listener unless
 
 Every push builds both deliverables in GitHub Actions:
 
-- **Windows:** `NetControl_<version>_x64-setup.exe` (NSIS installer)
+- **Windows:** `NetControl.exe` (portable Windows executable; no installer required)
 - **Android:** `netcontrol-android-debug.apk`
 
 Open the workflow run under **Actions > Build Windows installers and Android APK**

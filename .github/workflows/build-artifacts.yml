@@ -35,22 +35,41 @@ jobs:
         working-directory: apps/desktop
         run: npm ci
 
-      - name: Build NSIS installer
-        uses: tauri-apps/tauri-action@v0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          projectPath: apps/desktop
-          args: --bundles nsis
+      - name: Build portable Windows executable
+        shell: pwsh
+        run: |
+          npm run tauri build -- --no-bundle 2>&1 | Tee-Object -FilePath tauri-build.log
+          if ($LASTEXITCODE -ne 0) {
+            "### Windows executable build failed" | Out-File -Append $env:GITHUB_STEP_SUMMARY
+            Get-Content tauri-build.log -Tail 120 | Out-File -Append $env:GITHUB_STEP_SUMMARY
+            exit $LASTEXITCODE
+          }
 
-      - name: Upload Windows installers
+      - name: Stage executable
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force artifacts/windows | Out-Null
+          $candidates = @(
+            "target/release/netcontrol-desktop.exe",
+            "apps/desktop/src-tauri/target/release/netcontrol-desktop.exe"
+          )
+          $exe = $candidates | Where-Object { Test-Path $_ } | Select-Object -First 1
+          if (-not $exe) {
+            "### NetControl.exe was not produced" | Out-File -Append $env:GITHUB_STEP_SUMMARY
+            Get-ChildItem -Recurse -Filter "*.exe" | Select-Object FullName | Out-File -Append $env:GITHUB_STEP_SUMMARY
+            exit 1
+          }
+          Copy-Item $exe artifacts/windows/NetControl.exe
+
+      - name: Upload Windows executable and build log
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: netcontrol-windows
           path: |
-            target/release/bundle/**/*.exe
-            apps/desktop/src-tauri/target/release/bundle/**/*.exe
-          if-no-files-found: error
+            artifacts/windows/NetControl.exe
+            tauri-build.log
+          if-no-files-found: warn
 
   android:
     name: Android APK
@@ -59,27 +78,41 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install JDK 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 21
 
-      - name: Install Android SDK tools
-        uses: android-actions/setup-android@v3
-
-      - name: Install Android platform 35
+      - name: Configure Android SDK from runner image
         run: |
-          yes | sdkmanager --licenses >/dev/null || true
-          sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+          SDK="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
+          echo "ANDROID_HOME=$SDK" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK_ROOT=$SDK" >> "$GITHUB_ENV"
+          SDKMANAGER="$SDK/cmdline-tools/latest/bin/sdkmanager"
+          if [ ! -x "$SDKMANAGER" ]; then
+            echo "sdkmanager not found at $SDKMANAGER" >&2
+            exit 1
+          fi
+          echo "$(dirname "$SDKMANAGER")" >> "$GITHUB_PATH"
+          yes | "$SDKMANAGER" --licenses >/dev/null || true
+          "$SDKMANAGER" "platform-tools" "platforms;android-35" "build-tools;35.0.0"
 
       - name: Gradle cache
         uses: gradle/actions/setup-gradle@v4
 
       - name: Build debug APK
         working-directory: apps/android
+        shell: bash
         run: |
           chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon
+          set +e
+          ./gradlew assembleDebug --no-daemon --stacktrace 2>&1 | tee gradle-build.log
+          status=${PIPESTATUS[0]}
+          if [ "$status" -ne 0 ]; then
+            echo "### Android build failed" >> "$GITHUB_STEP_SUMMARY"
+            tail -120 gradle-build.log >> "$GITHUB_STEP_SUMMARY"
+            exit "$status"
+          fi
 
       - name: Stage APK
         run: |
