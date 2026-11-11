@@ -177,10 +177,13 @@ Windows installers: [packaging/windows/BUILD.md](packaging/windows/BUILD.md) / [
 
 ### 6. Android
 
-A working debug APK is included at [`deliverables/netcontrol-android-debug.apk`](deliverables/netcontrol-android-debug.apk).
+GitHub Actions builds a working debug APK on every push and publishes it as the
+`netcontrol-android-apk` artifact. Build it locally with:
 
 ```bash
-adb install -r deliverables/netcontrol-android-debug.apk
+cd apps/android
+./gradlew assembleDebug
+adb install -r app/build/outputs/apk/debug/app-debug.apk
 ```
 
 On an emulator use `http://10.0.2.2:8787/api/v1`; on a physical device use the
@@ -226,7 +229,7 @@ apps/android/             Kotlin + Jetpack Compose management client
 docs/                     architecture, API, install, gateways, security, limitations
 packaging/                Arch PKGBUILD, systemd units, Windows build workflow
 screenshots/              real screenshots of the desktop and Android apps
-deliverables/             built binaries and APK
+deliverables/             local build artifacts (ignored by Git; CI publishes APK/EXE)
 ```
 
 ---

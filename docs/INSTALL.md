@@ -226,16 +226,11 @@ APK:
 apps/android/app/build/outputs/apk/debug/app-debug.apk
 ```
 
-A built copy is included at:
-
-```
-deliverables/netcontrol-android-debug.apk
-```
-
-Install:
+The push-triggered workflow uploads the APK as the
+`netcontrol-android-apk` artifact. Install the local build with:
 
 ```bash
-adb install -r deliverables/netcontrol-android-debug.apk
+adb install -r apps/android/app/build/outputs/apk/debug/app-debug.apk
 adb shell am start -n dev.netcontrol.app/.MainActivity
 ```
 
