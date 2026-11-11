@@ -36,6 +36,7 @@ jobs:
         run: npm ci
 
       - name: Build portable Windows executable
+        working-directory: apps/desktop
         shell: pwsh
         run: |
           npm run tauri build -- --no-bundle 2>&1 | Tee-Object -FilePath tauri-build.log
@@ -68,7 +69,7 @@ jobs:
           name: netcontrol-windows
           path: |
             artifacts/windows/NetControl.exe
-            tauri-build.log
+            apps/desktop/tauri-build.log
           if-no-files-found: warn
 
   android:
