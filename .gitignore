@@ -21,3 +21,4 @@ packaging/arch/*.pkg.tar.zst
 *.tsbuildinfo
 apps/android/.idea/
 apps/desktop/src-tauri/gen/
+deliverables/
