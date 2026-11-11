@@ -552,7 +552,7 @@ mod platform {
         items(value).into_iter().filter_map(text).collect()
     }
 
-    fn prefix(value: &Value) -> u8 {
+    fn prefix_of(value: &Value) -> u8 {
         value
             .as_u64()
             .and_then(|v| u8::try_from(v).ok())
@@ -571,8 +571,8 @@ mod platform {
         if !output.status.success() {
             return Vec::new();
         }
-        let text = String::from_utf8_lossy(&output.stdout);
-        let value: Value = serde_json::from_str(text.trim()).unwrap_or(Value::Null);
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        let value: Value = serde_json::from_str(stdout.trim()).unwrap_or(Value::Null);
         items(&value)
             .into_iter()
             .map(|item| {
@@ -583,7 +583,7 @@ mod platform {
                     .into_iter()
                     .filter_map(|entry| {
                         let address = entry.get("IPAddress").and_then(text)?;
-                        let prefix = entry.get("PrefixLength").map(prefix).unwrap_or(24);
+                        let prefix = entry.get("PrefixLength").map(prefix_of).unwrap_or(24);
                         Some((address, prefix))
                     })
                     .collect();
